@@ -36,14 +36,16 @@ class MQTTWin(object):
         self.mqbutton = Button(self.root, text="Conn Igus", padx=5,
                              command=self.my_connect)
         self.mqbutton.grid(row=0,column=0,padx=2,pady=10)
+        
+        #2回押すとアクセス拒否
+        self.mv2button = Button(self.root, text="Connect SCB-PB", padx=5,
+                             command=self.connect_scb_pb)
+        self.mv2button.grid(row=0,column=1,padx=2,pady=10)
 
         self.mqbutton = Button(self.root, text="Connect MQTT", padx=5,
                              command=self.connect_mqtt)
-        self.mqbutton.grid(row=0,column=1,padx=2,pady=10)
-        
-        self.mv2button = Button(self.root, text="Connect SCB-PB", padx=5,
-                             command=self.connect_scb_pb)
-        self.mv2button.grid(row=0,column=2,padx=2,pady=10)
+        self.mqbutton.grid(row=0,column=2,padx=2,pady=10)
+    
 
         self.enable = Button(self.root, text="SetActive", padx=5,
                              command=self.setActive)
