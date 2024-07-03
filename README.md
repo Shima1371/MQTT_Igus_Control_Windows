@@ -1,7 +1,7 @@
 # Control igus Through MQTT (2024/07/03)
 
 MQTT でのメッセージを受け取って、
-igus を Ethernet 経由で制御
+igus を Ethernet 経由で制御かつ
 SRTのSCB-PB（ソフトグリッパーの空圧制御）をModbus RTU通信で制御
 
 CRI Ethernet Interface
