@@ -1,4 +1,4 @@
-#Control igus Through MQTT (2024/07/03)
+# Control igus Through MQTT (2024/07/03)
 
 MQTT でのメッセージを受け取って、
 igus を Ethernet 経由で制御
