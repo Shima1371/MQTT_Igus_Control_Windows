@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from threading import Thread
+import threading
 import time
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk, messagebox
 from tkinter.scrolledtext import ScrolledText
+# from dobot_api import *
 import json
 from paho.mqtt import client as mqtt
 import re
