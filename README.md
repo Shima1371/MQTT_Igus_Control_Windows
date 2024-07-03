@@ -8,6 +8,7 @@ Windowsで動作確認済、linuxはmodbus通信周りがうまくいくかわ�
 
 CRI Ethernet Interface
 https://wiki.cpr-robots.com/index.php/CRI_Ethernet_Interface
+(CRI V17 (since iRC/CPRog V14))
 
 SCB-PB
 https://www.softrobottech.com/web/jp/download?type=1&title=SCB-PB
