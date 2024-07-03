@@ -4,6 +4,8 @@ MQTT でのメッセージを受け取って、
 igus を Ethernet 経由で制御かつ
 SRTのSCB-PB（ソフトグリッパーの空圧制御）をModbus RTU通信で制御
 
+Windowsで動作確認済、linuxでは多分self.modbus_clientのポート名を変更する必要あり（他にもなんかあるかも）
+
 CRI Ethernet Interface
 https://wiki.cpr-robots.com/index.php/CRI_Ethernet_Interface
 
