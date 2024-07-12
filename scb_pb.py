@@ -1,4 +1,5 @@
 from pymodbus.client import ModbusSerialClient as ModbusClient
+# 明示的にimportしていないが，pip install pyserialが必要．なんか依存してる？
 
 # Modbus RTUクライアントの設定
 client = ModbusClient(method='rtu', port='COM3',stopbits=1, bytesize=8, parity='N', baudrate=38400, timeout=3) #baudrate=38400
