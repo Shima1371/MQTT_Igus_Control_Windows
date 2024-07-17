@@ -156,7 +156,8 @@ class MQTTWin(object):
         self.text_log.delete('1.0', 'end-1c')
     
     def my_connect(self):
-        # Enter the IP address of the robot ('192.168.3.11', 3920) here if you're not using a CPRog/iRC simulation ('172.19.16.1', 3921)
+        # Enter the IP address of the robot ('192.168.3.11', 3920) here if you're not using a CPRog/iRC simulation ('127.0.0.1', 3921)
+        # MEMO: my PC ('172.19.16.1', 3921)
         server_address = ('192.168.3.11', 3920)
         self.log_txt("Connecting..."+"\n")
         sock.connect(server_address)
