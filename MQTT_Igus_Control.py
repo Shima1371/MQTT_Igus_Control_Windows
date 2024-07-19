@@ -266,7 +266,7 @@ class MQTTWin(object):
             dx *= sc
             dy *= sc
             dz *= sc
-            print(dx,dy,dz)
+            # print(dx,dy,dz)
 
 
             if 'pad' in js:
