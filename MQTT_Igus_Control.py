@@ -23,6 +23,7 @@ class MQTTWin(object):
         self.lastErr = time.time()*1000 # epoch millisecond
         self.defPose =  ['284', '129', '393', '-174', '42', '-175']
         self.curPose = ['0','0','0','0','0','0']
+        self.jogvalues = ['0.0','0.0','0.0','0.0','0.0','0.0']
         self.lx = 0
         self.ly= 0
         self.lz  =0
@@ -63,6 +64,14 @@ class MQTTWin(object):
         self.mv4button = Button(self.root, text="Release", padx=5,
                              command=self.release)
         self.mv4button.grid(row=0,column=6,padx=2,pady=10)
+        
+        self.mvbutton = Button(self.root, text="Test2", padx=5,
+                             command=self.testMove2)
+        self.mvbutton.grid(row=0,column=7,padx=2,pady=10)
+        
+        self.mvbutton = Button(self.root, text="Test3", padx=5,
+                             command=self.testMove3)
+        self.mvbutton.grid(row=0,column=8,padx=2,pady=10)
 
 #         self.mv5button = Button(self.root, text="ClearErr", padx=5,
 #                              command=self.clear_error)
@@ -167,6 +176,12 @@ class MQTTWin(object):
         
         self.set_keep_alive()
         self.set_receive_message()
+        message = "CRISTART 1234 CMD MotionTypeCartBase CRIEND"
+        encoded=message.encode('utf-8')
+        array=bytearray(encoded)
+        # Send the main message
+        self.log_txt("Set the motion type Cartbase"+"\n")
+        sock.sendall(array)
         
     def set_keep_alive(self):
         if self.global_state["connect"]:
@@ -177,15 +192,19 @@ class MQTTWin(object):
         # I'm sending 10 more ALIVEJOG messages to keep the connection alive.
         # If I drop the connection too early our message may not get through.
         # A production program should send this once or twice a second from a parallel thread.
-        messageAliveJog = "CRISTART 1234 ALIVEJOG 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 CRIEND"
-        encodedAliveJog=messageAliveJog.encode('utf-8')
-        arrayAliveJog=bytearray(encodedAliveJog)
-        self.log_txt("Keeping connection alive"+"\n")
         while True:
             if not self.global_state["connect"]:
                 break
+            
+            jogvalues = self.jogvalues
+            messageAliveJog = "CRISTART 1234 ALIVEJOG "+jogvalues[0]+" "+jogvalues[1]+" "+jogvalues[2]+" "+jogvalues[3]+" "+jogvalues[4]+" "+jogvalues[5]+" 0.0 0.0 0.0 CRIEND"
+            encodedAliveJog=messageAliveJog.encode('utf-8')
+            arrayAliveJog=bytearray(encodedAliveJog)
+            # print("message:", messageAliveJog)
+            # self.log_txt("Keeping connection alive"+"\n")
             # print("Sending ALIVEJOG")
             sock.sendall(arrayAliveJog)
+            # print(arrayAliveJog)
             time.sleep(0.1)
             
     def set_receive_message(self):
@@ -235,7 +254,7 @@ class MQTTWin(object):
             self.lxd = xd
             self.lyd = yd
             self.lzd = zd
-        if self.lx != x or self.ly !=y or self.lz != z:
+        if True:
             dx = x-self.lx
             dy = y-self.ly
             dz = z-self.lz
@@ -243,11 +262,12 @@ class MQTTWin(object):
             dyd = yd-self.lyd
             dzd = zd-self.lzd
             # print(dxd,dyd,dzd)
-            sc = 1000
+            sc = 1500
             dx *= sc
             dy *= sc
             dz *= sc
-#            print(dx,dy,dz)
+            print(dx,dy,dz)
+
 
             if 'pad' in js:
                 pd = js['pad']
@@ -255,15 +275,21 @@ class MQTTWin(object):
                     print("reset")
                     self.resetRobot()
 
-                if abs(dx)>= 50 or abs(dy)>= 50 or abs(dz)>= 50 or abs(dxd)>=0.1 or abs(dyd)>=0.1 or abs(dzd)>=0.1:
+
+                if abs(dx)>= 5 or abs(dy)>= 5 or abs(dz)>= 5 or abs(dxd)>=0.1 or abs(dyd)>=0.1 or abs(dzd)>=0.1:
                     if pd['b0']!=1:
-                        self.relativeMove(dx,dy,dz,dxd*180,dyd*180,-dzd*180)
-                    self.lx = x
-                    self.ly = y
-                    self.lz = z
-                    self.lxd = xd
-                    self.lyd = yd
-                    self.lzd = zd
+                        self.jogvalues = [str(self.clamp_value(-dz)),str(self.clamp_value(-dx)),str(self.clamp_value(dy)),str(self.clamp_value(dzd*180)),str(self.clamp_value(dxd*180)),str(self.clamp_value(-dyd*180))]
+                    else:
+                        self.jogvalues =  ['0.0','0.0','0.0','0.0','0.0','0.0']
+                else:
+                    self.jogvalues =  ['0.0','0.0','0.0','0.0','0.0','0.0']
+                
+                self.lx = x
+                self.ly = y
+                self.lz = z
+                self.lxd = xd
+                self.lyd = yd
+                self.lzd = zd
         
                 if pd['bm']!=1:
                     self.release()
@@ -272,6 +298,8 @@ class MQTTWin(object):
                     
 
 
+    def clamp_value(self, x):
+        return max(-100, min(100, x))
             
     def connect_mqtt(self):
         self.client = mqtt.Client()  
@@ -313,18 +341,19 @@ class MQTTWin(object):
         pose = self.getPose()
         
         if pose:
-            pose[0]=str(float(pose[0])-x)
-            pose[1]=str(float(pose[1])-y)
-            pose[2]=str(float(pose[2])+z)
-            pose[3]=str(float(pose[3])-xd)
-            pose[4]=str(float(pose[4])+yd)
-            pose[5]=str(float(pose[5])+zd)
-            message = "CRISTART 1234 CMD Move Cart "+pose[0]+" "+pose[1]+" "+pose[2]+" "+pose[3]+" "+pose[4]+" "+pose[5]+" 0 0 0 200 #base CRIEND" #角度反映
+            pose[0]=str(100.0) if float(pose[0])-x > 0 else str(-100.0)
+            pose[1]=str(100.0) if float(pose[1])-y > 0 else str(-100.0)
+            pose[2]=str(100.0) if float(pose[2])+z > 0 else str(-100.0)
+            pose[3]=str(100.0) if float(pose[3])-xd > 0 else str(-100.0)
+            pose[4]=str(100.0) if float(pose[4])+yd > 0 else str(-100.0)
+            pose[5]=str(100.0) if float(pose[5])+zd > 0 else str(-100.0)
+            message = "CRISTART 1234 ALIVEJOG "+pose[0]+" "+pose[1]+" "+pose[2]+" 0.0 0.0 0.0 0.0 0.0 0.0 CRIEND" #角度反映
             encoded=message.encode('utf-8')
             array=bytearray(encoded)
             sock.sendall(array)
             print("input:",y,z,x,xd,yd,zd)
             print("message:", message)
+            time.sleep(0.1)
         
         #getPose()をしない分速いかもしれないが、コントローラの角度は反映されない
         # if True:
@@ -356,6 +385,15 @@ class MQTTWin(object):
         # Send the main message
         self.log_txt("Test1"+"\n")
         sock.sendall(array)
+        
+    def testMove2(self):
+        self.jogvalues =  ['50.0','0.0','0.0','0.0','0.0','0.0']
+        print(self.jogvalues)
+        
+    def testMove3(self):
+        self.jogvalues =  ['-50.0','0.0','0.0','0.0','0.0','0.0']
+        print(self.jogvalues)
+
         
     def grasp(self):
         response = self.modbus_client.write_register(address=1, value=1, slave=1)
