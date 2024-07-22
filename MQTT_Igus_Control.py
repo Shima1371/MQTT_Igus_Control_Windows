@@ -186,7 +186,7 @@ class MQTTWin(object):
                 break
             # print("Sending ALIVEJOG")
             sock.sendall(arrayAliveJog)
-            time.sleep(0.1)
+            time.sleep(0.02)
             
     def set_receive_message(self):
         if self.global_state["connect"]:
@@ -255,7 +255,7 @@ class MQTTWin(object):
                     print("reset")
                     self.resetRobot()
 
-                if abs(dx)>= 50 or abs(dy)>= 50 or abs(dz)>= 50 or abs(dxd)>=0.1 or abs(dyd)>=0.1 or abs(dzd)>=0.1:
+                if abs(dx)>= 10 or abs(dy)>= 10 or abs(dz)>= 10 or abs(dxd)>=0.1 or abs(dyd)>=0.1 or abs(dzd)>=0.1:
                     if pd['b0']!=1:
                         self.relativeMove(dx,dy,dz,dxd*180,dyd*180,-dzd*180)
                     self.lx = x
@@ -325,6 +325,7 @@ class MQTTWin(object):
             sock.sendall(array)
             print("input:",y,z,x,xd,yd,zd)
             print("message:", message)
+            time.sleep(0.02)
         
         #getPose()をしない分速いかもしれないが、コントローラの角度は反映されない
         # if True:
