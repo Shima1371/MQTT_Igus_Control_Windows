@@ -205,7 +205,7 @@ class MQTTWin(object):
             # print("Sending ALIVEJOG")
             sock.sendall(arrayAliveJog)
             # print(arrayAliveJog)
-            time.sleep(0.1)
+            time.sleep(0.02)
             
     def set_receive_message(self):
         if self.global_state["connect"]:
