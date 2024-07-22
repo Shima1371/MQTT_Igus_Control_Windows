@@ -200,7 +200,7 @@ class MQTTWin(object):
             messageAliveJog = "CRISTART 1234 ALIVEJOG "+jogvalues[0]+" "+jogvalues[1]+" "+jogvalues[2]+" "+jogvalues[3]+" "+jogvalues[4]+" "+jogvalues[5]+" 0.0 0.0 0.0 CRIEND"
             encodedAliveJog=messageAliveJog.encode('utf-8')
             arrayAliveJog=bytearray(encodedAliveJog)
-            # print("message:", messageAliveJog)
+            print("message:", messageAliveJog)
             # self.log_txt("Keeping connection alive"+"\n")
             # print("Sending ALIVEJOG")
             sock.sendall(arrayAliveJog)
@@ -223,7 +223,7 @@ class MQTTWin(object):
 # ブローカーに接続できたときの処理
     def on_connect(self,client, userdata, flag, rc):
         print("Connected with result code " + str(rc))  # 接続できた旨表示
-        self.client.subscribe("webxr/pose") #　connected -> subscribe
+        self.client.subscribe("webxr/pose2") #　connected -> subscribe
         self.log_txt("Connected MQTT"+"\n")
 
 # ブローカーが切断したときの処理
@@ -262,7 +262,7 @@ class MQTTWin(object):
             dyd = yd-self.lyd
             dzd = zd-self.lzd
             # print(dxd,dyd,dzd)
-            sc = 1500
+            sc = 2000
             dx *= sc
             dy *= sc
             dz *= sc
@@ -278,7 +278,7 @@ class MQTTWin(object):
 
                 if abs(dx)>= 5 or abs(dy)>= 5 or abs(dz)>= 5 or abs(dxd)>=0.1 or abs(dyd)>=0.1 or abs(dzd)>=0.1:
                     if pd['b0']!=1:
-                        self.jogvalues = [str(self.clamp_value(-dz)),str(self.clamp_value(-dx)),str(self.clamp_value(dy)),str(self.clamp_value(dzd*180)),str(self.clamp_value(dxd*180)),str(self.clamp_value(-dyd*180))]
+                        self.jogvalues = [str(self.clamp_value(-dz)),str(self.clamp_value(-dx)),str(self.clamp_value(dy)),str(self.clamp_value(dzd*1800)),str(self.clamp_value(-dxd*1800)),str(self.clamp_value(dyd*1800))]
                     else:
                         self.jogvalues =  ['0.0','0.0','0.0','0.0','0.0','0.0']
                 else:
@@ -337,23 +337,23 @@ class MQTTWin(object):
             return [float(num) for num in match.groups()]
         return None
         
-    def relativeMove(self,y,z,x,yd,zd,xd):
-        pose = self.getPose()
+    # def relativeMove(self,y,z,x,yd,zd,xd):
+    #     pose = self.getPose()
         
-        if pose:
-            pose[0]=str(100.0) if float(pose[0])-x > 0 else str(-100.0)
-            pose[1]=str(100.0) if float(pose[1])-y > 0 else str(-100.0)
-            pose[2]=str(100.0) if float(pose[2])+z > 0 else str(-100.0)
-            pose[3]=str(100.0) if float(pose[3])-xd > 0 else str(-100.0)
-            pose[4]=str(100.0) if float(pose[4])+yd > 0 else str(-100.0)
-            pose[5]=str(100.0) if float(pose[5])+zd > 0 else str(-100.0)
-            message = "CRISTART 1234 ALIVEJOG "+pose[0]+" "+pose[1]+" "+pose[2]+" 0.0 0.0 0.0 0.0 0.0 0.0 CRIEND" #角度反映
-            encoded=message.encode('utf-8')
-            array=bytearray(encoded)
-            sock.sendall(array)
-            print("input:",y,z,x,xd,yd,zd)
-            print("message:", message)
-            time.sleep(0.1)
+    #     if pose:
+    #         pose[0]=str(100.0) if float(pose[0])-x > 0 else str(-100.0)
+    #         pose[1]=str(100.0) if float(pose[1])-y > 0 else str(-100.0)
+    #         pose[2]=str(100.0) if float(pose[2])+z > 0 else str(-100.0)
+    #         pose[3]=str(100.0) if float(pose[3])-xd > 0 else str(-100.0)
+    #         pose[4]=str(100.0) if float(pose[4])+yd > 0 else str(-100.0)
+    #         pose[5]=str(100.0) if float(pose[5])+zd > 0 else str(-100.0)
+    #         message = "CRISTART 1234 ALIVEJOG "+pose[0]+" "+pose[1]+" "+pose[2]+" 0.0 0.0 0.0 0.0 0.0 0.0 CRIEND" #角度反映
+    #         encoded=message.encode('utf-8')
+    #         array=bytearray(encoded)
+    #         sock.sendall(array)
+    #         print("input:",y,z,x,xd,yd,zd)
+    #         print("message:", message)
+    #         time.sleep(0.1)
         
         #getPose()をしない分速いかもしれないが、コントローラの角度は反映されない
         # if True:
@@ -387,7 +387,7 @@ class MQTTWin(object):
         sock.sendall(array)
         
     def testMove2(self):
-        self.jogvalues =  ['50.0','0.0','0.0','0.0','0.0','0.0']
+        self.jogvalues =  ['0.0','0.0','0.0','50.0','0.0','0.0']
         print(self.jogvalues)
         
     def testMove3(self):
